@@ -1,7 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Net.Sockets;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -10,34 +6,53 @@ public class PlayerController : MonoBehaviour
     public float jumpForce;
     public Rigidbody2D rb;
 
-    private float movingInput;
+    private bool _canDoubleJump = true;
+    
+    private float _movingInput;
 
     public LayerMask whatIsGround;
     public float groundCheckDistance;
-    private bool isGrounded;
+    private bool _isGrounded;
 
     void Update()
     {
         CollisionCheck();
         
-        movingInput = Input.GetAxis("Horizontal");
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (isGrounded)
-            {
-                Jump();
-            }
-        }
+        InputChecks();
+
+        if (_isGrounded) _canDoubleJump = true;
         Move();
     }
-    private void Move()         => rb.velocity = new Vector2(moveSpeed * movingInput, rb.velocity.y);
+
+    private void InputChecks()
+    {
+        _movingInput = Input.GetAxis("Horizontal");
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            JumpButton();
+        }
+    }
+
+    private void JumpButton()
+    {
+        if (_isGrounded)
+        {
+            Jump();
+        } else if (_canDoubleJump)
+        {
+            _canDoubleJump = false;
+            Jump();
+        }
+    }
+
+    private void Move()         => rb.velocity = new Vector2(moveSpeed * _movingInput, rb.velocity.y);
 
     private void Jump()         => rb.velocity = new Vector2(rb.velocity.x, jumpForce);
 
     private bool CollisionCheck()
     {
-        isGrounded = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, whatIsGround);
-        return isGrounded;
+        _isGrounded = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, whatIsGround);
+        return _isGrounded;
     }
 
 
