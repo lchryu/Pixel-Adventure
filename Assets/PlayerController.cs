@@ -1,21 +1,36 @@
+using System;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    private Rigidbody2D rb;
+    private Animator anim;
+    
+    [Header("Move info")]
     public float moveSpeed;
     public float jumpForce;
-    public Rigidbody2D rb;
-
+    
     private bool _canDoubleJump = true;
     
     private float _movingInput;
-
+    
+    [Header("Collision info")]
     public LayerMask whatIsGround;
     public float groundCheckDistance;
+  
     private bool _isGrounded;
+
+    private void Start()
+    {
+        rb   = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
+    }
 
     void Update()
     {
+        bool isMoving = rb.velocity.x != 0;
+        anim.SetBool("isMoving", isMoving);
+        
         CollisionCheck();
         
         InputChecks();
