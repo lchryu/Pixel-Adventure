@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private Rigidbody2D rb;
-    private Animator anim;
+    private Rigidbody2D _rb;
+    private Animator _anim;
     
     [Header("Move info")]
     public float moveSpeed;
@@ -22,21 +22,28 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        rb   = GetComponent<Rigidbody2D>();
-        anim = GetComponent<Animator>();
+        _rb   = GetComponent<Rigidbody2D>();
+        _anim = GetComponent<Animator>();
     }
 
     void Update()
     {
-        bool isMoving = rb.velocity.x != 0;
-        anim.SetBool("isMoving", isMoving);
-        
+        AnimationController();
+
         CollisionCheck();
         
         InputChecks();
 
         if (_isGrounded) _canDoubleJump = true;
         Move();
+    }
+
+    private void AnimationController()
+    {
+        bool isMoving = _rb.velocity.x != 0;
+        _anim.SetBool("isMoving", isMoving);
+        _anim.SetBool("isGrounded", _isGrounded);
+        _anim.SetFloat("yVelocity", _rb.velocity.y);
     }
 
     private void InputChecks()
@@ -60,9 +67,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void Move()         => rb.velocity = new Vector2(moveSpeed * _movingInput, rb.velocity.y);
+    private void Move()         => _rb.velocity = new Vector2(moveSpeed * _movingInput, _rb.velocity.y);
 
-    private void Jump()         => rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+    private void Jump()         => _rb.velocity = new Vector2(_rb.velocity.x, jumpForce);
 
     private bool CollisionCheck()
     {
