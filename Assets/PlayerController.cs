@@ -20,6 +20,9 @@ public class PlayerController : MonoBehaviour
     public float wallCheckDistance;
     private bool _isGrounded;
     private bool _isWallDetected;
+    private bool _canWallSlide;
+    private bool _isWallSliding;
+    
     
     private bool _facingRight = true;
     private float facingDirection = 1;
@@ -39,6 +42,13 @@ public class PlayerController : MonoBehaviour
         InputChecks();
 
         if (_isGrounded) _canDoubleJump = true;
+
+        if (_canWallSlide)
+        {
+            _isWallSliding = true;
+            _rb.velocity = new Vector2(_rb.velocity.x, _rb.velocity.y * 0.1f);
+        }
+        
         Move();
     }
 
@@ -53,10 +63,9 @@ public class PlayerController : MonoBehaviour
     private void InputChecks()
     {
         _movingInput = Input.GetAxis("Horizontal");
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            JumpButton();
-        }
+        if (Input.GetAxis("Vertical") < 0) _canWallSlide = false;
+        
+        if (Input.GetKeyDown(KeyCode.Space)) JumpButton();
     }
 
     private void JumpButton()
@@ -96,6 +105,9 @@ public class PlayerController : MonoBehaviour
     {
         _isGrounded     = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, whatIsGround);
         _isWallDetected = Physics2D.Raycast(transform.position, Vector2.right * facingDirection, wallCheckDistance, whatIsGround);
+
+        if (_isWallDetected && _rb.velocity.y < 0) _canWallSlide = true;
+        if (!_isWallDetected) _canWallSlide = false;
     }
 
 
