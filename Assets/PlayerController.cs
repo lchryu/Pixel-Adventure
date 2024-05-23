@@ -49,7 +49,11 @@ public class PlayerController : MonoBehaviour
             _rb.velocity = new Vector2(_rb.velocity.x, _rb.velocity.y * 0.1f);
         }
         
-        Move();
+        if (!_isWallDetected)
+        {
+            _isWallSliding = false;
+            Move();
+        }
     }
 
     private void AnimationController()
@@ -57,6 +61,7 @@ public class PlayerController : MonoBehaviour
         bool isMoving = _rb.velocity.x != 0;
         _anim.SetBool("isMoving", isMoving);
         _anim.SetBool("isGrounded", _isGrounded);
+        _anim.SetBool("isWallSliding", _isWallSliding);
         _anim.SetFloat("yVelocity", _rb.velocity.y);
     }
 
@@ -70,19 +75,16 @@ public class PlayerController : MonoBehaviour
 
     private void JumpButton()
     {
-        if (_isGrounded)
-        {
-            Jump();
-        } else if (_canDoubleJump)
-        {
+        if (_isGrounded) Jump();
+        else if (_canDoubleJump) {
             _canDoubleJump = false;
             Jump();
         }
     }
 
-    private void Move()         => _rb.velocity = new Vector2(moveSpeed * _movingInput, _rb.velocity.y);
+    private void Move() => _rb.velocity = new Vector2(moveSpeed * _movingInput, _rb.velocity.y);
 
-    private void Jump()         => _rb.velocity = new Vector2(_rb.velocity.x, jumpForce);
+    private void Jump() => _rb.velocity = new Vector2(_rb.velocity.x, jumpForce);
 
     private void FlipController()
     {
